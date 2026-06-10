@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Holded — Hero</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling/lib/qr-code-styling.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Font Awesome 7 Pro';
+      font-weight: 400;
+      font-style: normal;
+      src: url('https://raw.githubusercontent.com/Jengarlo/holded-hero-interactivo/main/fonts/fa7-pro-regular.otf') format('opentype');
+    }
+    @font-face {
+      font-family: 'Font Awesome 7 Pro';
+      font-weight: 900;
+      font-style: normal;
+      src: url('https://raw.githubusercontent.com/Jengarlo/holded-hero-interactivo/main/fonts/fa7-pro-solid.otf') format('opentype');
+    }
+  </style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow: hidden; height: 100%; }
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input, textarea { font-family: inherit; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    .panel-scroll::-webkit-scrollbar { width: 3px; }
+    .panel-scroll::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+    .nav-btn { transition: background .12s; }
+    .nav-btn:hover { background: rgba(255,255,255,.07) !important; }
+    .tab-pill { transition: background .12s, color .12s; }
+    .tab-pill:not(.tab-active):hover { background: #d1d5db !important; }
+    .swatch-sq { transition: transform .12s; border: none; padding: 0; }
+    .swatch-sq:hover { transform: scale(1.2); }
+    .aprobar-btn { transition: color .12s; }
+    .aprobar-btn:hover { color: #1448c8 !important; }
+    .enviar-btn { transition: opacity .15s, transform .1s; }
+    .enviar-btn:hover { opacity: .88; }
+    .enviar-btn:hover svg { fill: white; }
+    .enviar-btn:active { transform: scale(.98); }
+    .add-line-btn { transition: color .12s; }
+    input::placeholder { color: #9ca3af; font-weight: 400; }
+    .msg-bubble { transition: background .12s; cursor: default; }
+    .msg-bubble:hover { background: #e9eaec !important; }
+    .hist-row { border-radius: 6px; transition: background .12s; cursor: default; }
+    .hist-row:hover { background: #f3f4f6; }
+    .hist-dot { animation: hist-reveal 0.9s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes hist-reveal {
+      0%   { transform: scale(1); background: #e5e7eb; box-shadow: 0 0 0 0px rgba(25,99,239,0); }
+      55%  { transform: scale(1.25); background: #eff6ff; box-shadow: 0 0 0 6px rgba(25,99,239,0.12); }
+      100% { transform: scale(1);   background: #eff6ff; box-shadow: 0 0 0 0px rgba(25,99,239,0); }
+    }
+    .hist-dot-inner { animation: hist-dot-color 0.9s ease-out both; }
+    @keyframes hist-dot-color {
+      0%   { background: #9ca3af; }
+      100% { background: #1963ef; }
+    }
+    .logo-box { transition: background .4s ease; }
+    .logo-pop { animation: logo-pop .45s cubic-bezier(.36,.07,.19,.97); }
+    @keyframes logo-pop {
+      0%   { transform: scale(1)    rotate(0deg); }
+      30%  { transform: scale(1.18) rotate(-8deg); }
+      60%  { transform: scale(1.12) rotate(6deg); }
+      100% { transform: scale(1)    rotate(0deg); }
+    }
+    .mockup-scale { transform-origin: top center; }
+    @media (max-width: 1350px) { .mockup-scale { transform: scale(0.82); } }
+    @media (max-width: 1100px) { .mockup-scale { transform: scale(0.68); } }
+    @media (max-width: 900px)  { .mockup-scale { transform: scale(0.55); } }
+    @media (max-width: 700px)  { .mockup-scale { transform: scale(0.43); } }
+    @media (max-width: 500px)  { .mockup-scale { transform: scale(0.31); } }
+    @media (max-width: 400px)  { .mockup-scale { transform: scale(0.25); } }
+    .msg-input:focus { border-color: #1963ef !important; outline: none; }
+    .verifactu-wrap { position: relative; display: inline-block; cursor: pointer; transition: transform .3s ease; }
+    .verifactu-wrap:hover { transform: scale(1.05); }
+    .verifactu-shine {
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.62) 50%, transparent);
+      transform: skewX(-15deg);
+      pointer-events: none;
+      opacity: 0;
+    }
+    .verifactu-wrap:hover .verifactu-shine {
+      animation: destello 1.2s ease forwards;
+    }
+    @keyframes destello {
+      0%   { left: -70%; opacity: 0; }
+      10%  { opacity: 1; }
+      100% { left: 130%; opacity: 0.5; }
+    }
+    .verifactu-intro { animation: verifactu-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both; }
+    @keyframes verifactu-in {
+      0%   { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    .verifactu-intro .verifactu-shine { animation: destello 1.2s ease 1s forwards; }
+    .check-pop { animation: check-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both; }
+    @keyframes check-pop {
+      0%   { transform: scale(0); opacity: 0; }
+      60%  { transform: scale(1.18); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+<script>
+  // Prevent scroll-to-focus: briefly mark input readonly so browser skips scroll,
+  // then restore immediately so typing works normally.
+  document.addEventListener('mousedown', function(e) {
+    var t = e.target;
+    if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') {
+      t.setAttribute('readonly', '');
+      setTimeout(function() { t.removeAttribute('readonly'); }, 0);
+    }
+  }, true);
+  // Also block any residual scroll reset
+  function lockScroll() {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+  window.addEventListener('scroll', lockScroll, { passive: false });
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ── Figma assets ──────────────────────────────────────── */
+const A = {
+  diamond:  "data:image/svg+xml,%3Csvg width='16' height='14' viewBox='0 0 16 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 0L15.5 7L8 14L0.5 7Z' fill='white'/%3E%3C/svg%3E",
+  avatar:   "data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23e5e7eb'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%239ca3af'/%3E%3Cpath d='M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10' fill='%239ca3af'/%3E%3C/svg%3E",
+  group:    "data:image/svg+xml,%3Csvg width='26' height='26' viewBox='0 0 26 26' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='1' y='1' width='11' height='11' rx='2.5' fill='white'/%3E%3Crect x='14' y='1' width='11' height='11' rx='2.5' fill='white' opacity='0.7'/%3E%3Crect x='1' y='14' width='11' height='11' rx='2.5' fill='white' opacity='0.7'/%3E%3Crect x='14' y='14' width='11' height='11' rx='2.5' fill='white' opacity='0.4'/%3E%3C/svg%3E",
+  qr:       "data:image/svg+xml,%3Csvg width='76' height='76' viewBox='0 0 76 76' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='76' height='76' fill='white'/%3E%3C/svg%3E",
+  check:    "data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='10' fill='%2316a34a'/%3E%3Cpath d='M6 10.5l2.5 2.5 5.5-6' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
+  dot:      "data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='3' cy='3' r='3' fill='%239ca3af'/%3E%3C/svg%3E",
+  brandDot: "data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='3' cy='3' r='3' fill='%237c5cfc'/%3E%3C/svg%3E",
+  verifactu:"badge-verifactu-es.svg",
+  onlineDot:"data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='4' r='4' fill='%2322c55e'/%3E%3C/svg%3E",
+};
+
+/* Swatches exactos del Figma */
+const SWATCHES = ['#7C5CFC','#0891B2','#16A34A','#EA580C','#1E293B'];
+
+/* Hex → rgba helper para el logo de la factura */
+const hexRgba = (hex, a) => {
+  const [r,g,b] = [1,3,5].map(i => parseInt(hex.slice(i,i+2),16));
+  return `rgba(${r},${g},${b},${a})`;
+};
+
+/* Nav items exactos del Figma (6225:196) — FA7 Pro Regular unicode */
+const NAV = [
+  { u:'\uf015', label:'Inicio'       },
+  { u:'\ue0e3', label:'Ventas',  active:true },
+  { u:'\uf543', label:'Compras'      },
+  { u:'\uf5fd', label:'Inventario'   },
+  { u:'\uf19c', label:'Tesorería'    },
+  { u:'\ue0e4', label:'Contabilidad' },
+  { u:'\uf56c', label:'Impuestos'    },
+  { u:'\ue473', label:'Analítica'    },
+];
+
+/* ── QR Code escaneable con estilo redondeado ───────────── */
+function QRImg({ url, size }) {
+  const ref = React.useRef();
+  React.useEffect(() => {
+    if (!ref.current) return;
+    ref.current.innerHTML = '';
+    const qr = new QRCodeStyling({
+      width: size,
+      height: size,
+      type: 'svg',
+      data: url,
+      margin: 0,
+      qrOptions: { errorCorrectionLevel: 'M' },
+      dotsOptions:          { type: 'rounded',       color: '#111827' },
+      cornersSquareOptions: { type: 'extra-rounded', color: '#111827' },
+      cornersDotOptions:    { type: 'dot',           color: '#111827' },
+      backgroundOptions:    { color: '#ffffff' },
+    });
+    qr.append(ref.current);
+  }, [url, size]);
+  return <div ref={ref} style={{width:size, height:size, lineHeight:0}} />;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SIDEBAR  (62 × 600, #1f2937)
+───────────────────────────────────────────────────────── */
+function Sidebar() {
+  return (
+    <div style={{
+      width:62, flexShrink:0, minHeight:600,
+      background:'#1f2937',
+      borderRight:'0.9px solid #4b5563',
+      display:'flex', flexDirection:'column',
+      alignItems:'center',
+      paddingTop:20,
+    }}>
+      {/* Holded logo mark */}
+      <img src={A.diamond} alt="Holded"
+        style={{width:16.184, height:14.133, display:'block', marginBottom:20, filter:'brightness(0) invert(1)' }} />
+
+      {/* Separator */}
+      <div style={{width:'100%', height:'0.9px', background:'#374151', marginBottom:10}} />
+
+      {/* Nav — hover only, no click */}
+      <div style={{
+        display:'flex', flexDirection:'column',
+        gap:10, padding:'0 15px', flex:1, alignItems:'stretch',
+      }}>
+        {NAV.map((n,i) => (
+          <div key={i} title={n.label}
+            className="nav-btn"
+            style={{
+              display:'flex', alignItems:'center', justifyContent:'center',
+              width:'100%', height:28, padding:'7.64px',
+              borderRadius:6, cursor:'default',
+              background: i===1 ? '#374151' : 'transparent',
+              color:       i===1 ? '#f3f4f6' : '#9ca3af',
+              fontSize:13,
+            }}>
+            <span style={{fontFamily:'"Font Awesome 7 Pro"', fontWeight:400, fontSize:14, lineHeight:1, display:'block'}}>{n.u}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Separator */}
+      <div style={{width:'100%', height:'0.9px', background:'#374151', marginTop:10}} />
+
+      {/* Avatar */}
+      <div style={{paddingTop:20, paddingBottom:20}}>
+        <div style={{
+          width:28, height:28, borderRadius:'50%',
+          background:'#f3f0ff',
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          <span style={{fontFamily:'Inter', fontWeight:700, fontSize:13, color:'#7c5cfc', lineHeight:1}}>B</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const fmt = n => {
+  const s = n.toFixed(2);
+  return (s.endsWith('.00') ? String(Math.round(n)) : s.replace('.',',')) + ' €';
+};
+
+/* ─────────────────────────────────────────────────────────
+   INVOICE CARD  (664 × 576) — flex layout, líneas dinámicas
+───────────────────────────────────────────────────────── */
+function InvoiceCard({ accent, onTotalChange }) {
+  const P = 30, W = 580;
+
+  const [lines, setLines] = React.useState([
+    { id:1, name:'Diseño web',  desc:'Landing page corporativa + responsive.',     qty:1, price:1100 },
+    { id:2, name:'Branding',    desc:'Logotipo, paleta de colores y guía de marca.', qty:1, price:546  },
+  ]);
+
+  const [focusedId, setFocusedId] = React.useState(null);
+  const [hoveredId, setHoveredId] = React.useState(null);
+  const [logoPop,   setLogoPop]   = React.useState(false);
+  const isFirst = React.useRef(true);
+  React.useEffect(() => {
+    if (isFirst.current) { isFirst.current = false; return; }
+    setLogoPop(true);
+    const t = setTimeout(() => setLogoPop(false), 500);
+    return () => clearTimeout(t);
+  }, [accent]);
+  const removeLine = (id) => setLines(l => l.filter(ln => ln.id !== id));
+
+  const [lastNewId, setLastNewId] = React.useState(null);
+  const addLine = () => {
+    const id = Date.now();
+    setLines(l => [...l, { id, name:'', desc:'', qty:0, price:0 }]);
+    setLastNewId(id);
+  };
+  const updateLine = (id, field, val) => setLines(l => l.map(ln =>
+    ln.id === id ? { ...ln, [field]: (field==='qty'||field==='price') ? (parseFloat(val)||0) : val } : ln
+  ));
+
+  const subtotal = lines.reduce((s,l) => s + l.qty * l.price, 0);
+  const iva      = subtotal * 0.21;
+  const total    = subtotal + iva;
+
+  React.useEffect(() => { onTotalChange && onTotalChange(total); }, [total]);
+
+  const D = () => <div style={{height:1, background:'#f3f4f6', marginLeft:P, marginRight:P}} />;
+
+  return (
+    <div style={{
+      margin:'20px auto',
+      width:W, minHeight:640,
+      background:'white', border:'1px solid #e5e7eb',
+      borderRadius:4, boxShadow:'0px 2px 6px 0px rgba(0,0,0,0.07)',
+      display:'flex', flexDirection:'column',
+    }}>
+
+      {/* ── HEADER — padding P=30 en los 4 lados ── */}
+      <div style={{flexShrink:0, position:'relative', width:W,
+        display:'flex', alignItems:'center', padding:P, paddingBottom:P}}>
+        <div style={{position:'absolute', bottom:0, left:P, right:P, height:1, background:'#f3f4f6'}} />
+        {/* Logo + texto en flex, altura fija igual al logo box */}
+        <div style={{display:'flex', alignItems:'flex-start', gap:10, height:44, flexShrink:0}}>
+          <div className={`logo-box${logoPop ? ' logo-pop' : ''}`}
+            style={{width:44, height:44, flexShrink:0, background:accent, borderRadius:10,
+            display:'flex', alignItems:'center', justifyContent:'center'}}>
+            <img src={A.group} alt="" style={{width:25.658, height:26.131, display:'block', filter:'brightness(0) invert(1)'}} />
+          </div>
+          <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', height:44}}>
+            <div style={{fontSize:14, fontWeight:700, color:'#111827', lineHeight:1}}>Solar Tech S.A</div>
+            <div>
+              <div style={{fontSize:10, fontWeight:500, color:'#9ca3af', lineHeight:'13px'}}>Passeig de Gràcia, 78</div>
+              <div style={{fontSize:10, fontWeight:500, color:'#9ca3af', lineHeight:'13px'}}>08008 Barcelona</div>
+            </div>
+          </div>
+        </div>
+        {/* QR alineado a la derecha */}
+        <div style={{flexShrink:0, width:76, height:76, overflow:'hidden', marginLeft:'auto'}}>
+          <QRImg url="https://www.holded.com/es/programa-facturacion-verifactu" size={76} />
+        </div>
+      </div>
+
+      {/* ── CLIENTE + TOTAL ── */}
+      <div style={{flexShrink:0, position:'relative', padding:`16px ${P}px`}}>
+        <div style={{position:'absolute', bottom:0, left:P, right:P, height:1, background:'#f3f4f6'}} />
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
+          <div style={{display:'flex', flexDirection:'column', gap:6}}>
+            <div style={{fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:'0.06em'}}>CLIENTE</div>
+            <div style={{fontSize:14, fontWeight:600, color:'#374151'}}>Proyecto Volta S.L.</div>
+            <div style={{fontSize:12, fontWeight:400, color:'#9ca3af'}}>08027 Barcelona</div>
+            <div style={{fontSize:12, fontWeight:400, color:'#9ca3af'}}>12345678A</div>
+          </div>
+          <div style={{display:'flex', flexDirection:'column', gap:6, alignItems:'flex-end'}}>
+            <div style={{fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:'0.06em'}}>TOTAL</div>
+            <div style={{fontSize:22, fontWeight:700, color:'#111827'}}>{fmt(total)}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── CABECERAS COLUMNAS (37px) ── */}
+      <div style={{flexShrink:0, position:'relative', height:37}}>
+        <div style={{position:'absolute', bottom:0, left:P, right:P, height:1, background:'#f3f4f6'}} />
+        <div style={{position:'absolute', left:P,   top:14, fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:'0.06em'}}>DESCRIPCIÓN</div>
+        <div style={{position:'absolute', right:216, top:14, fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:'0.06em', textAlign:'right'}}>CANTIDAD</div>
+        <div style={{position:'absolute', right:113, top:14, fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:'0.06em', textAlign:'right'}}>PRECIO</div>
+        <div style={{position:'absolute', right:P,   top:14, fontSize:9, fontWeight:700, color:'#9ca3af', letterSpacing:'0.06em', textAlign:'right'}}>TOTAL</div>
+      </div>
+
+      {/* ── LÍNEAS (scrollable) ── */}
+      <div style={{flexShrink:0}}>
+        {lines.map((line) => {
+          const isNew = line.id > 2;
+          const inpStyle = (extra) => ({
+            position:'absolute', background:'transparent', border:'none', outline:'none',
+            fontFamily:'inherit', padding:0, ...extra,
+          });
+          return (
+            <React.Fragment key={line.id}>
+              <div
+                onMouseEnter={() => isNew && setHoveredId(line.id)}
+                onMouseLeave={() => isNew && setHoveredId(null)}
+                onFocus={() => isNew && setFocusedId(line.id)}
+                onBlur={() => isNew && setFocusedId(null)}
+                onClick={e => { if (isNew && e.target === e.currentTarget) e.currentTarget.querySelector('input')?.focus(); }}
+                style={{
+                  position:'relative', height:52, cursor: isNew ? 'text' : 'default',
+                  background: (isNew && focusedId === line.id) ? hexRgba(accent, 0.10) : 'transparent',
+                }}>
+                {isNew
+                  ? <input
+                      autoFocus={line.id === lastNewId}
+                      placeholder="Nuevo artículo"
+                      value={line.name} onChange={e=>updateLine(line.id,'name',e.target.value)} onFocus={e=>e.target.select()}
+                      style={inpStyle({left:P, top:19, width:290, fontSize:12, fontWeight:600, color:'#1f2937'})} />
+                  : <div style={{position:'absolute', left:P, top:10, fontSize:12, fontWeight:600, color:'#1f2937', lineHeight:'13px'}}>{line.name}</div>
+                }
+                {!isNew && <div style={{position:'absolute', left:P, top:28, fontSize:12, fontWeight:400, color:'#9ca3af', lineHeight:'13px'}}>{line.desc}</div>}
+                {isNew
+                  ? <div style={{position:'absolute', right:216, top:15, display:'flex', alignItems:'center', gap:3}}>
+                      <input type="number" min="0" value={line.qty||''} placeholder="0" onChange={e=>updateLine(line.id,'qty',e.target.value)} onFocus={e=>e.target.select()}
+                        style={{width:40, fontSize:12, fontWeight:400, color:'#374151', textAlign:'right', background:'transparent', border:'none', outline:'none', fontFamily:'inherit', padding:0}} />
+                      <span style={{fontSize:12, fontWeight:400, color:'#374151'}}>uds.</span>
+                    </div>
+                  : <div style={{position:'absolute', right:216, top:15, fontSize:12, fontWeight:400, color:'#374151', textAlign:'right', width:60}}>{line.qty} uds.</div>
+                }
+                {isNew
+                  ? <div style={{position:'absolute', right:113, top:15, display:'flex', alignItems:'center', gap:3}}>
+                      <input type="number" min="0" value={line.price||''} placeholder="0" onChange={e=>updateLine(line.id,'price',e.target.value)} onFocus={e=>e.target.select()}
+                        style={{width:60, fontSize:12, fontWeight:400, color:'#374151', textAlign:'right', background:'transparent', border:'none', outline:'none', fontFamily:'inherit', padding:0}} />
+                      <span style={{fontSize:12, fontWeight:400, color:'#374151'}}>€</span>
+                    </div>
+                  : <div style={{position:'absolute', right:113, top:15, fontSize:12, fontWeight:400, color:'#374151', textAlign:'right', width:80}}>{line.price > 0 ? fmt(line.price) : '—'}</div>
+                }
+                <div style={{position:'absolute', right:P, top:15, fontSize:12, fontWeight:600,
+                  color: line.qty*line.price > 0 ? '#1f2937' : '#9ca3af', textAlign:'right'}}>
+                  {line.qty*line.price > 0 ? fmt(line.qty*line.price) : '0'}
+                </div>
+                {isNew && hoveredId === line.id && (
+                  <button
+                    onMouseDown={e => { e.preventDefault(); removeLine(line.id); }}
+                    style={{
+                      position:'absolute', right:-10, top:'50%', transform:'translateY(-50%)',
+                      width:20, height:20, borderRadius:'50%',
+                      background:accent, color:'white',
+                      fontSize:12, lineHeight:'20px',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      flexShrink:0, zIndex:10,
+                      boxShadow:'0 2px 6px rgba(0,0,0,0.25)',
+                    }}>×</button>
+                )}
+              </div>
+              <D />
+            </React.Fragment>
+          );
+        })}
+        {(() => {
+          const [hov, setHov] = React.useState(false);
+          const c = hov ? hexRgba(accent, 0.5) : accent;
+          return (
+            <button className="add-line-btn" onClick={addLine}
+              onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+              style={{display:'flex', alignItems:'center', gap:6, color:c, fontSize:12, fontWeight:500, background:'transparent', padding:`10px ${P}px`, height:38}}>
+              <svg width="10" height="10" viewBox="0 0 10 10">
+                <line x1="5" y1="0" x2="5" y2="10" stroke={c} strokeWidth="1.5"/>
+                <line x1="0" y1="5" x2="10" y2="5" stroke={c} strokeWidth="1.5"/>
+              </svg>
+              Añadir artículo
+            </button>
+          );
+        })()}
+      </div>
+
+      {/* ── FOOTER ── */}
+      <div style={{flexShrink:0, padding:`${P}px`}}>
+        <div style={{height:1, background:'#f3f4f6', marginBottom:P}} />
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:16}}>
+          <div>
+            <div style={{fontSize:12, fontWeight:600, color:'#6b7280', marginBottom:6}}>Información y detalles de pago</div>
+            <div style={{fontSize:12, fontWeight:400, color:'#9ca3af'}}>Pago por transferencia bancaria</div>
+          </div>
+          <div style={{minWidth:194}}>
+            <div style={{display:'flex', justifyContent:'space-between', marginBottom:5}}>
+              <span style={{fontSize:10, fontWeight:500, color:'#9ca3af'}}>SUBTOTAL</span>
+              <span style={{fontSize:12, fontWeight:400, color:'#6b7280'}}>{fmt(subtotal)}</span>
+            </div>
+            <div style={{display:'flex', justifyContent:'space-between', marginBottom:8}}>
+              <span style={{fontSize:10, fontWeight:500, color:'#9ca3af'}}>IVA (21%)</span>
+              <span style={{fontSize:12, fontWeight:400, color:'#6b7280'}}>{fmt(iva)}</span>
+            </div>
+            <div style={{height:1, background:'#f3f4f6', marginBottom:8}} />
+            <div style={{display:'flex', justifyContent:'space-between'}}>
+              <span style={{fontSize:12, fontWeight:700, color:'#111827'}}>TOTAL</span>
+              <span style={{fontSize:12, fontWeight:700, color:'#111827'}}>{fmt(total)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   RIGHT PANEL  (377 × 600)
+   padding: 34px top/bottom, 30px left/right | gap: 18px
+───────────────────────────────────────────────────────── */
+function RightPanel({ accent, onAccentChange, invoiceTotal }) {
+  const [tab,      setTab]      = useState('general');
+  const [approved, setApproved] = useState(false);
+  const [msgs,     setMsgs]     = useState([
+    { initials:'M',  color:'#0891b2', name:'María García',
+      time:'31/03/2026 · 10:45', text:'Factura revisada. Todo correcto, lista para aprobar.' },
+    { initials:'B',  color:'#7c5cfc', name:'Yo',
+      time:'31/03/2026 · 10:52', text:'Gracias por revisarlo tan rápido María!' },
+  ]);
+  const [msgInput, setMsgInput] = useState('');
+  const panelScrollRef = React.useRef(null);
+  React.useEffect(() => {
+    const el = panelScrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [msgs]);
+
+  const sendMsg = () => {
+    if (!msgInput.trim()) return;
+    setMsgs(p => [...p, {
+      initials:'B', color:'#7c5cfc', name:'Yo', time:'ahora', text:msgInput.trim()
+    }]);
+    setMsgInput('');
+  };
+
+  /* Divider a ancho completo (compensa el padding de 30px) */
+  const HR = () => (
+    <div style={{height:1, background:'#f3f4f6', flexShrink:0}} />
+  );
+
+  const SecTitle = ({children}) => (
+    <div style={{fontSize:12, fontWeight:600, color:'#111827', marginBottom:10}}>{children}</div>
+  );
+
+  return (
+    <div style={{
+      width:377, flexShrink:0, height:600, alignSelf:'stretch',
+      background:'white', borderLeft:'1px solid #f3f4f6',
+      display:'flex', flexDirection:'column',
+    }}>
+
+      {/* ── TABS (pill style exacto de Figma) ── */}
+      <div style={{
+        display:'flex', flexDirection:'column',
+        padding:'20px 30px 0',
+        flexShrink:0,
+      }}>
+        <div style={{display:'flex', gap:6, paddingBottom:16}}>
+        {[['general','General'],['mensajes','Mensajes'],['historial','Historial']].map(([id,lbl]) => (
+          <button key={id} onClick={() => setTab(id)}
+            className={`tab-pill${tab===id ? ' tab-active' : ''}`}
+            style={{
+              flex:1,
+              height:34,
+              fontSize:12, fontWeight:600,
+              color:       tab===id ? 'white'   : '#111827',
+              background:  tab===id ? '#111827' : '#e5e7eb',
+              borderRadius:6,
+            }}>
+            {lbl}
+          </button>
+        ))}
+        </div>
+        <div style={{height:1, background:'#f3f4f6'}} />
+      </div>
+
+      {/* ── CONTENT ── */}
+      <div className="panel-scroll" ref={panelScrollRef}
+        style={{
+          flex:1, overflowY:'auto',
+          padding:'24px 30px',
+          display:'flex', flexDirection:'column', gap:18,
+        }}>
+
+        {/* ═══════ GENERAL ═══════ */}
+        {tab==='general' && <>
+
+          {/* Filas de metadatos */}
+          <div style={{display:'flex', flexDirection:'column', gap:10}}>
+            {[
+              ['Total',            fmt(invoiceTotal)],
+              ['Num de documento', 'F260001'  ],
+              ['Cliente',          'Proyecto Volta S.L.'],
+              ['Fecha',            '29/03/2026'],
+            ].map(([k,v]) => (
+              <div key={k} style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                <span style={{fontSize:12, fontWeight:500, color:'#9ca3af'}}>{k}</span>
+                <span style={{fontSize:12, fontWeight:600, color:'#111827'}}>{v}</span>
+              </div>
+            ))}
+          </div>
+
+          <HR/>
+
+          {/* Badge verde — Revisada */}
+          <div style={{
+            background:'#ecfdf5', borderRadius:6,
+            padding:12,
+            display:'flex', alignItems:'center', gap:12,
+          }}>
+            <img src={A.check} alt="" className="check-pop" style={{width:20, height:20, flexShrink:0, display:'block'}} />
+            <div>
+              <p style={{fontSize:12, fontWeight:600, color:'#166534', lineHeight:'14px'}}>
+                Revisada por tu asesor
+              </p>
+              <p style={{fontSize:12, fontWeight:500, color:'#111827', marginTop:4, lineHeight:'14px'}}>
+                María García · 31/03/2026
+              </p>
+            </div>
+          </div>
+
+          <HR/>
+
+          {/* Estado Borrador + Aprobar */}
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+            {approved ? (
+              <div style={{
+                display:'inline-flex', alignItems:'center', gap:4,
+                background:'#ebfbf5', borderRadius:6, padding:'4px 9px',
+              }}>
+                <img src="data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='4' r='4' fill='%2316a34a'/%3E%3C/svg%3E" alt="" style={{width:8, height:8, display:'block'}} />
+                <span style={{fontSize:12, fontWeight:600, color:'#1b8751', lineHeight:'14px'}}>Aprobada</span>
+              </div>
+            ) : (
+              <div style={{
+                display:'inline-flex', alignItems:'center', gap:4,
+                background:'#f3f4f6', borderRadius:6, padding:'4px 9px',
+              }}>
+                <img src={A.dot} alt="" style={{width:6, height:6, display:'block'}} />
+                <span style={{fontSize:12, fontWeight:600, color:'#111827', lineHeight:'14px'}}>Borrador</span>
+              </div>
+            )}
+            {!approved && (
+              <button className="aprobar-btn"
+                onClick={() => setApproved(true)}
+                style={{fontSize:12, fontWeight:600, color:'#1963ef', padding:0}}>
+                Aprobar
+              </button>
+            )}
+          </div>
+
+          <HR/>
+
+          {/* Categorización */}
+          <div>
+            <SecTitle>Categorización</SecTitle>
+            <div style={{
+              display:'flex', justifyContent:'space-between', alignItems:'center',
+              padding:'4px 0',
+            }}>
+              <span style={{fontSize:12, fontWeight:500, color:'#9ca3af'}}>Cuenta contable</span>
+              <div style={{
+                display:'inline-flex', alignItems:'center', gap:4,
+                background:'#f3f4f6', borderRadius:6, padding:'4px 9px',
+              }}>
+                <img src={A.brandDot} alt="" style={{width:6, height:6, display:'block'}} />
+                <span style={{fontSize:12, fontWeight:600, color:'#111827'}}>Prestación de servicios</span>
+              </div>
+            </div>
+          </div>
+
+          <HR/>
+
+          {/* Tema color */}
+          <div>
+            <SecTitle>Tema color</SecTitle>
+            <div style={{display:'flex', alignItems:'center', gap:6}}>
+              {SWATCHES.map(c => (
+                <button key={c} onClick={() => onAccentChange(c)}
+                  className="swatch-sq"
+                  style={{
+                    width:18, height:18, borderRadius:4,
+                    background:c, flexShrink:0,
+                    outline:  accent===c ? '2px solid rgba(209,213,219,0.8)' : 'none',
+                    outlineOffset: 1,
+                  }} />
+              ))}
+              <button style={{
+                width:38, height:18, borderRadius:4,
+                background:'#f3f4f6', fontSize:11, fontWeight:500, color:'#9ca3af',
+              }}>+100</button>
+            </div>
+          </div>
+        </>}
+
+        {/* ═══════ MENSAJES ═══════ */}
+        {tab==='mensajes' && <React.Fragment>
+          {msgs.map((m,i) => {
+            const isOwn = m.name === 'Yo';
+            return (
+            <div key={i} style={{display:'flex', gap:8, alignItems:'flex-start', flexDirection: isOwn ? 'row-reverse' : 'row'}}>
+              <div style={{
+                width:28, height:28, borderRadius:'50%', flexShrink:0,
+                background: isOwn ? '#f3f0ff' : '#e0f5fb',
+                display:'flex', alignItems:'center', justifyContent:'center',
+              }}>
+                <span style={{fontSize:13, fontWeight:700, color: isOwn ? '#7c5cfc' : '#0891b2'}}>{m.initials}</span>
+              </div>
+              <div style={{position:'relative', flex:'none', maxWidth:'calc(100% - 74px)'}}>
+                {/* Cola del bubble */}
+                {!isOwn && (
+                  <svg width="10" height="16" viewBox="0 0 10 16" style={{position:'absolute', left:-9, top:10, display:'block'}}>
+                    <path d="M10 2 L2 8 L10 14 Z" fill="#f1f2f4"/>
+                  </svg>
+                )}
+                {isOwn && (
+                  <svg width="10" height="16" viewBox="0 0 10 16" style={{position:'absolute', right:-9, top:10, display:'block'}}>
+                    <path d="M0 2 L8 8 L0 14 Z" fill="#f1f2f4"/>
+                  </svg>
+                )}
+                <div className="msg-bubble" style={{background:'#f1f2f4', borderRadius:6, padding:'10px 12px'}}>
+                  <div style={{display:'flex', justifyContent:'space-between', marginBottom:4}}>
+                    <span style={{fontSize:12, fontWeight:600, color:'#374151'}}>{m.name}</span>
+                    <span style={{fontSize:10, color:'#9ca3af'}}>{m.time}</span>
+                  </div>
+                  <p style={{fontSize:12, color:'#6b7280', lineHeight:'17px'}}>{m.text}</p>
+                </div>
+              </div>
+            </div>
+            );
+          })}
+        </React.Fragment>}
+
+        {/* ═══════ HISTORIAL ═══════ */}
+        {tab==='historial' && (() => {
+          const items = [
+            { action:'Factura creada',             user:'Biel González', time:'29/03/2026 · 09:12' },
+            { action:'Revisada por el Asesor',      user:'María García',   time:'31/03/2026 · 10:44' },
+            { action:'Enviada por email',           user:'Biel González', time:'31/03/2026 · 11:01' },
+          ];
+          return (
+            <div style={{position:'relative', margin:'0 -6px'}}>
+              {/* línea continua: empieza/termina en el centro de cada círculo extremo */}
+              <div style={{position:'absolute', left:15, top:17, bottom:17, width:1, background:'#f3f4f6'}} />
+              {items.map((item,i) => (
+                <div key={i} className="hist-row" style={{display:'flex', gap:10, alignItems:'center', padding:'8px 6px', marginBottom: i < items.length-1 ? 16 : 0}}>
+                  <div className="hist-dot" style={{
+                    width:18, height:18, borderRadius:9, flexShrink:0,
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    position:'relative', zIndex:1,
+                    animationDelay: `${i * 0.45}s`,
+                  }}>
+                    <div className="hist-dot-inner" style={{width:6, height:6, borderRadius:3, animationDelay: `${i * 0.45}s`}} />
+                  </div>
+                  <div>
+                    <p style={{fontSize:12, fontWeight:600, color:'#374151', lineHeight:'17px'}}>{item.action}</p>
+                    <p style={{fontSize:12, fontWeight:400, color:'#9ca3af', marginTop:2}}>{item.user} · {item.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+      </div>{/* end content */}
+
+      {/* ── INPUT MENSAJE ── */}
+      {tab==='mensajes' && <>
+        <div style={{height:1, background:'#f3f4f6', flexShrink:0, margin:'0 30px'}} />
+        <div style={{padding:'20px 30px', flexShrink:0, display:'flex', gap:6}}>
+          <input
+            className="msg-input"
+            value={msgInput}
+            onChange={e => setMsgInput(e.target.value)}
+            onKeyDown={e => { if (e.key==='Enter') sendMsg(); }}
+            placeholder="Escribe un mensaje…"
+            style={{
+              flex:1, border:'1px solid #e5e7eb', borderRadius:6,
+              padding:'7px 10px', fontSize:12, color:'#374151',
+            }}
+          />
+          <button onClick={sendMsg} style={{
+            width:32, height:32, borderRadius:6,
+            background:'#1963ef', color:'white', fontSize:20, flexShrink:0,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            lineHeight:1, paddingBottom:2,
+          }}>›</button>
+        </div>
+        <div style={{height:1, background:'#f3f4f6', flexShrink:0, margin:'0 30px'}} />
+      </>}
+
+      {/* ── BOTÓN ENVIAR ── */}
+      <div style={{
+        padding:'20px 30px 20px',
+        flexShrink:0,
+      }}>
+        <button className="enviar-btn" style={{
+          width:'100%', height:38,
+          background: '#1963ef', color:'white',
+          borderRadius:6, fontSize:12, fontWeight:600,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+        }}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Enviar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   APP ROOT
+───────────────────────────────────────────────────────── */
+function App() {
+  const [accent, setAccent] = useState('#7C5CFC');
+  const [invoiceTotal, setInvoiceTotal] = useState(1991.66);
+  const [vfIntro, setVfIntro] = useState(true);
+  React.useEffect(() => {
+    const t = setTimeout(() => setVfIntro(false), 2200);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div style={{
+      position:'fixed', inset:0, background:'#0a0a0a',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      overflow:'hidden',
+    }}>
+      {/* Glow sutil */}
+      <div style={{
+        position:'absolute', pointerEvents:'none',
+        width:1000, height:500,
+        background:'radial-gradient(ellipse, rgba(124,92,252,.09) 0%, transparent 65%)',
+        top:'50%', left:'50%', transform:'translate(-50%,-50%)',
+      }} />
+
+      <div className="mockup-scale" style={{position:'relative'}}>
+        {/* Verifactu badge */}
+        <div className={`verifactu-wrap${vfIntro ? ' verifactu-intro' : ''}`} style={{position:'absolute', top:-59, right:-54, width:112, height:112, zIndex:10}}>
+          <img src={A.verifactu} alt="Verifactu Software Certificado"
+            style={{width:112, height:112, display:'block'}} />
+          {/* clip interior al círculo visual del badge — inset ~6px */}
+          <div style={{position:'absolute', inset:6, borderRadius:'50%', overflow:'hidden', pointerEvents:'none'}}>
+            <div className="verifactu-shine" style={{position:'absolute', top:'-10%', left:'-70%', width:'45%', height:'120%'}} />
+          </div>
+        </div>
+
+        {/* ─── LA CARD ─── */}
+        <div style={{
+          display:'flex',
+          width:1215, height:600,
+          background:'white',
+          border:'1px solid rgba(255,255,255,0.08)',
+          borderRadius:'16px 16px 0 0',
+          boxShadow:'0px 25px 50px -12px rgba(0,0,0,0.5)',
+          overflow:'hidden',
+        }}>
+          <Sidebar />
+
+          {/* Área principal — fondo gris con invoice card dentro */}
+          <div style={{
+            width:776, background:'#f9fafb',
+            flexShrink:0,
+          }}>
+            <InvoiceCard accent={accent} onTotalChange={setInvoiceTotal} />
+          </div>
+
+          <RightPanel accent={accent} onAccentChange={setAccent} invoiceTotal={invoiceTotal} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
