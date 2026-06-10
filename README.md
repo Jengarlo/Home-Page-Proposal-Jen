@@ -1,4 +1,6 @@
-# Holded — Home (copia estática para iteración de diseño)
+# Home Page Proposal — Jen
+
+Propuesta de home (copia estática para iteración de diseño)
 
 Snapshot estático de la home de [holded.com/es](https://www.holded.com/es) preparado para **iterar sobre las imágenes de producto** y compartir propuestas con el equipo.
 
